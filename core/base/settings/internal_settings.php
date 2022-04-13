@@ -1,9 +1,11 @@
 <?php
 
+use core\base\exceptions\RouteException;
+
 defined('VG_ACCESS') or die('Access denied.');
 
 const TEMPLATE = 'templates/default/';
-const ADMIN_TEMPLATES = 'core/admin/views/';
+const ADMIN_TEMPLATE = 'core/admin/views/';
 const COOKIE_VERSION = '1.0.0';
 const CRYPT_KEY = '';
 const COOKIE_TIME = 60;
@@ -21,3 +23,13 @@ const USER_CSS_JS = [
     'styles' => [],
     'scripts' => []
 ];
+
+function autoloadMainClasses($className) {
+    $className = str_replace('\\', '/', $className);
+
+    if (!@include_once $className . '.php') {
+        throw new RouteException('No correct file name - ' . $className);
+    }
+}
+
+spl_autoload_register('autoloadMainClasses');
