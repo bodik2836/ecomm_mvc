@@ -40,8 +40,17 @@ class Settings
 
     private function __clone() {}
 
+    static public function instance()
+    {
+        if (self::$_instance instanceof self) {
+            return self::$_instance;
+        }
+
+        return self::$_instance = new self();
+    }
+
     static public function get($property) {
-        return self::getInstance()->$property;
+        return self::instance()->$property;
     }
 
     public function clueProperties($class) {
@@ -57,6 +66,8 @@ class Settings
 
             if (!$property) $baseProperties[$name] = $this->$name;
         }
+
+        return $baseProperties;
     }
 
     public function arrayMergeRecursive() {
@@ -79,13 +90,5 @@ class Settings
         }
 
         return $base;
-    }
-
-    static public function getInstance() {
-        if (self::$_instance instanceof self) {
-            return self::$_instance;
-        }
-
-        return self::$_instance = new self();
     }
 }

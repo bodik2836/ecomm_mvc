@@ -24,8 +24,11 @@ const USER_CSS_JS = [
     'scripts' => []
 ];
 
+/**
+ * @throws \core\base\exceptions\RouteException
+ */
 function autoloadMainClasses($className) {
-    $className = str_replace('\\', '/', $className);
+    $className = __DIR__ . '/../../../' . str_replace('\\', '/', $className);
 
     if (!@include_once $className . '.php') {
         throw new RouteException('No correct file name - ' . $className);
