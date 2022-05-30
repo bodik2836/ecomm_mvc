@@ -32,8 +32,35 @@ class RouteController
                 throw new RouteException('Site for maintenance.');
             }
 
-            if (strrpos($address_str, $this->routes['admin']['alias']) === strlen(PATH)) {
-                // to be countinue
+            if (strpos($address_str, $this->routes['admin']['alias']) === strlen(PATH)) {
+                $url = explode('/', substr($address_str, strlen(PATH . $this->routes['admin']['alias']) + 1));
+
+                if ($url[0] && is_dir($_SERVER['DOCUMENT_ROOT']) . PATH . $this->routes['plugins']['path'] . $url[0]) {
+                    $plugin = array_shift($url);
+                    $pluginSettings = $this->routes['settings']['path'] . ucfirst($plugin . 'Settings');
+
+                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . PATH . $pluginSettings . '.php')) {
+                        $pluginSettings = str_replace('/', '\\', $pluginSettings);
+                        $this->routes = $pluginSettings::get('routes');
+                    }
+
+                    $dir = $this->routes['plugins']['dir'] ? '/' . $this->routes['plugins']['dir'] . '/' : '/';
+                    $dir = str_replace('//', '/', $dir);
+
+                    $this->controller = $this->routes['plugins']['path'] . $plugin . $dir;
+
+                    $hrUrl = $this->routes['plugins']['htUrl'];
+
+                    $route = 'plugins';
+
+                } else {
+                    $this->controller = $this->routes['admin']['path'];
+
+                    $hrUrl = $this->routes['admin']['htUrl'];
+
+                    $route = 'admin';
+                }
+
             } else {
                 $url = explode('/', substr($address_str, strlen(PATH)));
                 $hrUrl = $this->routes['user']['hrUrl'];
@@ -44,6 +71,29 @@ class RouteController
             }
 
             $this->createRoute($route, $url);
+
+            if ($url[1]) {
+                $count = count($url);
+                $key = '';
+
+                if (!$hrUrl) {
+                    $i = 1;
+                } else {
+                    $this->parameters['alias'] = $url[1];
+                    $i = 2;
+                }
+
+                for (; $i < $count; $i++) {
+                    if (!$key) {
+                        $key = $url[$i];
+                        $this->parameters[$key] = '';
+                    } else {
+                        $this->parameters[$key] = $url[$i];
+                        $key = '';
+                    }
+                }
+            }
+
         } else {
             try {
                 throw new \Exception('No correct site directory.');
