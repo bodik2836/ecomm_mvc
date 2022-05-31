@@ -35,7 +35,7 @@ class RouteController
             if (strpos($address_str, $this->routes['admin']['alias']) === strlen(PATH)) {
                 $url = explode('/', substr($address_str, strlen(PATH . $this->routes['admin']['alias']) + 1));
 
-                if ($url[0] && is_dir($_SERVER['DOCUMENT_ROOT']) . PATH . $this->routes['plugins']['path'] . $url[0]) {
+                if ($url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])) {
                     $plugin = array_shift($url);
                     $pluginSettings = $this->routes['settings']['path'] . ucfirst($plugin . 'Settings');
 
@@ -93,6 +93,7 @@ class RouteController
                     }
                 }
             }
+            exit();
 
         } else {
             try {
@@ -108,8 +109,8 @@ class RouteController
         $route = [];
 
         if (!empty($arr[0])) {
-            if ($this->routes[$var]['routes'][$arr][0]) {
-                $route = explode('/', $this->routes[$var]['routes'][$arr][0]);
+            if ($this->routes[$var]['routes'][$arr[0]]) {
+                $route = explode('/', $this->routes[$var]['routes'][$arr[0]]);
 
                 $this->controller .= ucfirst($route[0] . 'Controller');
             } else {
